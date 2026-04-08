@@ -3,9 +3,9 @@
   "name": "PetSafe Smart Feed",
   "codeowners": ["@kitcorey"],
   "config_flow": true,
-  "documentation": "https://github.com/kit/ha-petsafe-smartfeed",
+  "documentation": "https://github.com/kitcorey/ha-petsafe-smartfeed",
   "iot_class": "cloud_polling",
-  "issue_tracker": "https://github.com/kit/ha-petsafe-smartfeed/issues",
+  "issue_tracker": "https://github.com/kitcorey/ha-petsafe-smartfeed/issues",
   "requirements": [],
-  "version": "1.0.0"
+  "version": "0.1.0"
 }
