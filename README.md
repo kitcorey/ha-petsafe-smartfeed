@@ -4,8 +4,10 @@ Custom Home Assistant integration for the PetSafe Smart Feed v2 automatic pet fe
 
 ## Features
 
-- **Battery Level** sensor (0-100%)
+- **Battery Level** sensor (0-100%, raw voltage in attributes)
 - **Food Level** sensor (Full / Low / Empty)
+- **Last Seen** sensor (when the feeder last connected to the cloud)
+- **Settings Synced** binary sensor (detects when settings haven't reached the feeder)
 - **Slow Feed** switch
 - **Paused** switch (pause/resume scheduled feedings)
 - **Child Lock** switch
@@ -31,10 +33,9 @@ The integration will discover all feeders on your account automatically.
 
 ## Rate Limiting
 
-PetSafe's API enforces a strict rate limit of **one request per 5 minutes**. This integration respects that limit:
+The PetSafe API is undocumented and community-reverse-engineered. This integration polls every 5 minutes to be conservative:
 
-- Data is polled every 5 minutes
-- A secondary rate-limit guard prevents any accidental rapid requests
+- Data is polled every 5 minutes via the DataUpdateCoordinator
 - Switch toggles and feed commands use optimistic local state updates to provide instant UI feedback
 
 ## Services
@@ -57,6 +58,8 @@ See `example_automations/` for ready-to-use automation YAML for:
 
 - **Battery low alert** - notifies when battery drops below 20%
 - **Food low alert** - notifies when the food level changes to Low or Empty
+- **Connection lost alert** - notifies when the feeder hasn't connected in 24 hours
+- **Settings not synced alert** - notifies when settings changes haven't reached the feeder
 
 ## Development
 

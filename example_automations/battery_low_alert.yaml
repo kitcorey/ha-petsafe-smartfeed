@@ -17,8 +17,8 @@ triggers:
 conditions:
   - condition: template
     value_template: >
-      {{ (now() - state_attr('automation.petsafe_battery_low_alert', 'last_triggered')
-          | default(now() - timedelta(days=2), true)).total_seconds() > 86400 }}
+      {{ (now() - (state_attr('automation.petsafe_battery_low_alert', 'last_triggered')
+          | default(now() - timedelta(days=2), true))).total_seconds() > 86400 }}
 actions:
   - action: notify.mobile_app_your_phone
     data:

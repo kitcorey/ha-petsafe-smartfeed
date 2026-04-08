@@ -25,6 +25,15 @@ class PetSafeEntity(CoordinatorEntity[PetSafeCoordinator]):
         )
 
     @property
+    def available(self) -> bool:
+        """Return True if the feeder is in the coordinator data."""
+        return (
+            super().available
+            and self.coordinator.data is not None
+            and self._thing_name in self.coordinator.data
+        )
+
+    @property
     def feeder_data(self) -> PetSafeFeederData:
         """Return the current feeder data from the coordinator."""
         return self.coordinator.data[self._thing_name]

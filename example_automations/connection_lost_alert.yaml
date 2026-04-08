@@ -13,7 +13,7 @@ mode: single
 triggers:
   - trigger: template
     value_template: >
-      {{ now() - states.sensor.your_feeder_last_seen.last_changed
+      {{ now() - (states('sensor.your_feeder_last_seen') | as_datetime)
          > timedelta(hours=24) }}
 actions:
   - action: notify.mobile_app_your_phone

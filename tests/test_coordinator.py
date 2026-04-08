@@ -24,6 +24,7 @@ def mock_client():
     client.id_token = "mock-id-token"
     client.refresh_token = "mock-refresh-token"
     client.access_token = "mock-access-token"
+    client.token_expires_at = 0
     feeder = PetSafeFeederData.from_api(MOCK_FEEDER_API_RESPONSE)
     client.get_feeders = AsyncMock(return_value=[feeder])
     return client
@@ -103,3 +104,13 @@ class TestPetSafeCoordinator:
         await coordinator._async_update_data()
 
         mock_hass.config_entries.async_update_entry.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_empty_feeders_raises_update_failed(
+        self, mock_hass, mock_client, mock_entry
+    ):
+        mock_client.get_feeders = AsyncMock(return_value=[])
+        coordinator = PetSafeCoordinator(mock_hass, mock_client, mock_entry)
+
+        with pytest.raises(UpdateFailed, match="no feeders"):
+            await coordinator._async_update_data()

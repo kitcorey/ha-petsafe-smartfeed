@@ -62,4 +62,5 @@ MOCK_CONFIG_ENTRY_DATA = {
     "id_token": "mock-id-token",
     "refresh_token": "mock-refresh-token",
     "access_token": "mock-access-token",
+    "token_expires_at": 0,
 }

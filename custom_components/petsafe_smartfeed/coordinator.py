@@ -3,6 +3,8 @@
 import logging
 from datetime import timedelta
 
+import aiohttp
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
@@ -13,6 +15,7 @@ from .const import (
     CONF_ACCESS_TOKEN,
     CONF_ID_TOKEN,
     CONF_REFRESH_TOKEN,
+    CONF_TOKEN_EXPIRES_AT,
     DOMAIN,
     MIN_API_INTERVAL,
 )
@@ -51,8 +54,11 @@ class PetSafeCoordinator(DataUpdateCoordinator[dict[str, PetSafeFeederData]]):
             raise ConfigEntryAuthFailed(
                 "PetSafe authentication failed, please re-authenticate"
             ) from err
-        except (PetSafeError, Exception) as err:
+        except (PetSafeError, aiohttp.ClientError, TimeoutError) as err:
             raise UpdateFailed(f"Error communicating with PetSafe: {err}") from err
+
+        if not feeders:
+            raise UpdateFailed("PetSafe API returned no feeders")
 
         self._persist_tokens()
 
@@ -65,6 +71,7 @@ class PetSafeCoordinator(DataUpdateCoordinator[dict[str, PetSafeFeederData]]):
             self.client.id_token != entry_data.get(CONF_ID_TOKEN)
             or self.client.refresh_token != entry_data.get(CONF_REFRESH_TOKEN)
             or self.client.access_token != entry_data.get(CONF_ACCESS_TOKEN)
+            or self.client.token_expires_at != entry_data.get(CONF_TOKEN_EXPIRES_AT)
         ):
             self.hass.config_entries.async_update_entry(
                 self.config_entry,
@@ -73,6 +80,7 @@ class PetSafeCoordinator(DataUpdateCoordinator[dict[str, PetSafeFeederData]]):
                     CONF_ID_TOKEN: self.client.id_token,
                     CONF_REFRESH_TOKEN: self.client.refresh_token,
                     CONF_ACCESS_TOKEN: self.client.access_token,
+                    CONF_TOKEN_EXPIRES_AT: self.client.token_expires_at,
                 },
             )
             _LOGGER.debug("Persisted refreshed tokens to config entry")

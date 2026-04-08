@@ -1,5 +1,6 @@
 """Async API client for PetSafe Smart Feed."""
 
+import asyncio
 import logging
 import re
 import time
@@ -12,8 +13,6 @@ from .const import (
     API_BASE_URL,
     BATTERY_VOLTAGE_MAX,
     BATTERY_VOLTAGE_MIN,
-    BATTERY_VOLTAGE_REFERENCE,
-    BATTERY_VOLTAGE_SCALE,
     COGNITO_CLIENT_ID,
     COGNITO_ENDPOINT,
     FOOD_STATUS_MAP,
@@ -124,28 +123,28 @@ class PetSafeClient:
         self._challenge_name: str | None = None
         self._username: str | None = None
 
-    @property
-    def tokens_changed(self) -> bool:
-        """Check if tokens differ from what was passed at construction."""
-        return True  # Always persist after refresh for safety
-
     async def _cognito_request(self, target: str, payload: dict) -> dict:
         """Make a request to the AWS Cognito Identity Provider API."""
         headers = {
             "Content-Type": "application/x-amz-json-1.1",
             "X-Amz-Target": f"AWSCognitoIdentityProviderService.{target}",
         }
-        async with self._session.post(
-            COGNITO_ENDPOINT, headers=headers, json=payload
-        ) as resp:
-            body = await resp.json(content_type=None)
-            if resp.status != 200:
-                error_type = body.get("__type", "UnknownError")
-                error_msg = body.get("message", resp.reason)
-                if "NotAuthorizedException" in error_type:
-                    raise PetSafeAuthError(error_msg)
-                raise PetSafeError(f"Cognito {target} failed: {error_type}: {error_msg}")
-            return body
+        try:
+            async with self._session.post(
+                COGNITO_ENDPOINT, headers=headers, json=payload
+            ) as resp:
+                body = await resp.json(content_type=None)
+                if resp.status != 200:
+                    error_type = body.get("__type", "UnknownError")
+                    error_msg = body.get("message", resp.reason)
+                    if "NotAuthorizedException" in error_type:
+                        raise PetSafeAuthError(error_msg)
+                    raise PetSafeError(
+                        f"Cognito {target} failed: {error_type}: {error_msg}"
+                    )
+                return body
+        except (aiohttp.ClientError, asyncio.TimeoutError) as err:
+            raise PetSafeError(f"Network error during {target}: {err}") from err
 
     async def request_code(self) -> None:
         """Request a login code be sent to the user's email."""
@@ -228,44 +227,53 @@ class PetSafeClient:
     async def _api_get(self, path: str) -> dict | list:
         """GET from PetSafe API."""
         await self._ensure_token()
-        async with self._session.get(
-            f"{API_BASE_URL}{path}", headers=self._api_headers()
-        ) as resp:
-            if resp.status == 401:
-                raise PetSafeAuthError("Token expired or invalid")
-            if resp.status != 200:
-                raise PetSafeError(
-                    f"API GET {path} failed: {resp.status} {resp.reason}"
-                )
-            return await resp.json()
+        try:
+            async with self._session.get(
+                f"{API_BASE_URL}{path}", headers=self._api_headers()
+            ) as resp:
+                if resp.status == 401:
+                    raise PetSafeAuthError("Token expired or invalid")
+                if resp.status != 200:
+                    raise PetSafeError(
+                        f"API GET {path} failed: {resp.status} {resp.reason}"
+                    )
+                return await resp.json()
+        except (aiohttp.ClientError, asyncio.TimeoutError) as err:
+            raise PetSafeError(f"Network error during GET {path}: {err}") from err
 
     async def _api_post(self, path: str, data: dict | None = None) -> dict | list:
         """POST to PetSafe API."""
         await self._ensure_token()
-        async with self._session.post(
-            f"{API_BASE_URL}{path}", headers=self._api_headers(), json=data
-        ) as resp:
-            if resp.status == 401:
-                raise PetSafeAuthError("Token expired or invalid")
-            if resp.status not in (200, 201):
-                raise PetSafeError(
-                    f"API POST {path} failed: {resp.status} {resp.reason}"
-                )
-            return await resp.json()
+        try:
+            async with self._session.post(
+                f"{API_BASE_URL}{path}", headers=self._api_headers(), json=data
+            ) as resp:
+                if resp.status == 401:
+                    raise PetSafeAuthError("Token expired or invalid")
+                if resp.status not in (200, 201):
+                    raise PetSafeError(
+                        f"API POST {path} failed: {resp.status} {resp.reason}"
+                    )
+                return await resp.json()
+        except (aiohttp.ClientError, asyncio.TimeoutError) as err:
+            raise PetSafeError(f"Network error during POST {path}: {err}") from err
 
     async def _api_put(self, path: str, data: dict | None = None) -> dict | list:
         """PUT to PetSafe API."""
         await self._ensure_token()
-        async with self._session.put(
-            f"{API_BASE_URL}{path}", headers=self._api_headers(), json=data
-        ) as resp:
-            if resp.status == 401:
-                raise PetSafeAuthError("Token expired or invalid")
-            if resp.status != 200:
-                raise PetSafeError(
-                    f"API PUT {path} failed: {resp.status} {resp.reason}"
-                )
-            return await resp.json()
+        try:
+            async with self._session.put(
+                f"{API_BASE_URL}{path}", headers=self._api_headers(), json=data
+            ) as resp:
+                if resp.status == 401:
+                    raise PetSafeAuthError("Token expired or invalid")
+                if resp.status != 200:
+                    raise PetSafeError(
+                        f"API PUT {path} failed: {resp.status} {resp.reason}"
+                    )
+                return await resp.json()
+        except (aiohttp.ClientError, asyncio.TimeoutError) as err:
+            raise PetSafeError(f"Network error during PUT {path}: {err}") from err
 
     async def get_feeders(self) -> list[PetSafeFeederData]:
         """Fetch all feeders and parse into data objects."""
