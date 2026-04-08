@@ -1,0 +1,31 @@
+# PetSafe Smart Feed - Battery Low Alert
+#
+# Sends a notification when the feeder battery drops below 20%.
+# Limits alerts to once per day to avoid spam.
+#
+# Update the entity_id and notify service to match your setup.
+
+alias: "PetSafe Battery Low Alert"
+description: "Alert when PetSafe feeder battery drops below 20%"
+mode: single
+triggers:
+  - trigger: numeric_state
+    entity_id: sensor.kitchen_feeder_battery_level  # Update to your entity
+    below: 20
+    for:
+      minutes: 30
+conditions:
+  - condition: template
+    value_template: >
+      {{ (now() - state_attr('automation.petsafe_battery_low_alert', 'last_triggered')
+          | default(now() - timedelta(days=2), true)).total_seconds() > 86400 }}
+actions:
+  - action: notify.mobile_app_your_phone
+    data:
+      title: "PetSafe Feeder Battery Low"
+      message: >
+        {{ state_attr('sensor.kitchen_feeder_battery_level', 'friendly_name') }}
+        battery is at {{ states('sensor.kitchen_feeder_battery_level') }}%.
+      data:
+        push:
+          interruption-level: time-sensitive

@@ -1,0 +1,29 @@
+# PetSafe Smart Feed - Settings Not Synced Alert
+#
+# Sends a notification when the feeder's settings are out of sync with the
+# cloud. This means changes made in the app or HA (like pausing the schedule)
+# have NOT been applied to the feeder hardware.
+#
+# Update the entity_id and notify service to match your setup.
+
+alias: "PetSafe Settings Not Synced Alert"
+description: "Alert when PetSafe feeder settings are out of sync"
+mode: single
+triggers:
+  - trigger: state
+    entity_id: binary_sensor.your_feeder_settings_synced
+    to: "on"
+    for:
+      minutes: 30
+actions:
+  - action: notify.mobile_app_your_phone
+    data:
+      title: "PetSafe Feeder Settings Out of Sync"
+      message: >
+        The cat feeder has not applied recent settings changes
+        (revision {{ state_attr('binary_sensor.your_feeder_settings_synced', 'revision_reported') }}
+        of {{ state_attr('binary_sensor.your_feeder_settings_synced', 'revision_desired') }}).
+        Schedule or other settings may not be active on the device.
+      data:
+        push:
+          interruption-level: time-sensitive

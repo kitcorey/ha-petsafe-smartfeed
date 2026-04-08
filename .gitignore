@@ -1,0 +1,29 @@
+# artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# misc
+.coverage
+.vscode
+coverage.xml
+.env
+.venv/
+venv/
+*.swp
+*.swo
+.DS_Store
+
+# Home Assistant configuration
+config/*
+!config/configuration.yaml
+**/authcache
+**/exports

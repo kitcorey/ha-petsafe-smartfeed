@@ -1,0 +1,28 @@
+# PetSafe Smart Feed - Connection Lost Alert
+#
+# Sends a notification when the feeder hasn't been seen for 24 hours.
+# The "last seen" sensor reflects when the PetSafe cloud last heard from the
+# feeder — if it's stale, the feeder is likely offline (WiFi issue, power loss,
+# etc.) and settings changes (like pausing the schedule) won't reach it.
+#
+# Update the entity_id and notify service to match your setup.
+
+alias: "PetSafe Connection Lost Alert"
+description: "Alert when PetSafe feeder hasn't connected in 24 hours"
+mode: single
+triggers:
+  - trigger: template
+    value_template: >
+      {{ now() - states.sensor.your_feeder_last_seen.last_changed
+         > timedelta(hours=24) }}
+actions:
+  - action: notify.mobile_app_your_phone
+    data:
+      title: "PetSafe Feeder Offline"
+      message: >
+        The cat feeder hasn't connected to the cloud since
+        {{ states('sensor.your_feeder_last_seen') | as_timestamp | timestamp_custom('%b %d at %-I:%M %p') }}.
+        Settings changes (schedule, paused, etc.) will not reach the feeder until it reconnects.
+      data:
+        push:
+          interruption-level: time-sensitive

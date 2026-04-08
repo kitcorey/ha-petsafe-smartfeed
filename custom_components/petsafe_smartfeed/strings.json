@@ -1,0 +1,70 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "PetSafe Smart Feed",
+        "description": "Enter the email address associated with your PetSafe account. A verification code will be sent to this email.",
+        "data": {
+          "email": "Email"
+        }
+      },
+      "code": {
+        "title": "Enter Verification Code",
+        "description": "A verification code has been sent to {email}. Enter it below.",
+        "data": {
+          "code": "Verification code"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Re-authenticate PetSafe",
+        "description": "Your PetSafe session has expired. Press submit to send a new verification code to {email}."
+      },
+      "reauth_code": {
+        "title": "Enter Verification Code",
+        "description": "A verification code has been sent to {email}. Enter it below.",
+        "data": {
+          "code": "Verification code"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Invalid verification code",
+      "cannot_connect": "Unable to connect to PetSafe",
+      "unknown": "An unexpected error occurred"
+    },
+    "abort": {
+      "already_configured": "This PetSafe account is already configured",
+      "no_feeders": "No feeders found on this account",
+      "reauth_successful": "Re-authentication successful"
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "settings_synced": {
+        "name": "Settings synced"
+      }
+    },
+    "sensor": {
+      "battery_level": {
+        "name": "Battery"
+      },
+      "food_level": {
+        "name": "Food level"
+      },
+      "last_seen": {
+        "name": "Last seen"
+      }
+    },
+    "switch": {
+      "slow_feed": {
+        "name": "Slow feed"
+      },
+      "paused": {
+        "name": "Paused"
+      },
+      "child_lock": {
+        "name": "Child lock"
+      }
+    }
+  }
+}

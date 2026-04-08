@@ -1,0 +1,10 @@
+# Minimal Home Assistant configuration for development/testing.
+# The petsafe_smartfeed integration uses config_flow, so add it through the UI:
+# Settings > Devices & Services > Add Integration > search "PetSafe Smart Feed"
+
+default_config:
+
+logger:
+  default: info
+  logs:
+    custom_components.petsafe_smartfeed: debug

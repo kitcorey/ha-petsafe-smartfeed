@@ -1,0 +1,11 @@
+{
+  "domain": "petsafe_smartfeed",
+  "name": "PetSafe Smart Feed",
+  "codeowners": [],
+  "config_flow": true,
+  "documentation": "https://github.com/kit/ha-petsafe-smartfeed",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/kit/ha-petsafe-smartfeed/issues",
+  "requirements": [],
+  "version": "1.0.0"
+}

@@ -1,0 +1,24 @@
+# PetSafe Smart Feed - Food Low Alert
+#
+# Sends a notification when the feeder food level changes to "Low" or "Empty".
+#
+# Update the entity_id and notify service to match your setup.
+
+alias: "PetSafe Food Low Alert"
+description: "Alert when PetSafe feeder is low or out of food"
+mode: single
+triggers:
+  - trigger: state
+    entity_id: sensor.kitchen_feeder_food_level  # Update to your entity
+    to: "Low"
+  - trigger: state
+    entity_id: sensor.kitchen_feeder_food_level  # Update to your entity
+    to: "Empty"
+actions:
+  - action: notify.mobile_app_your_phone
+    data:
+      title: "PetSafe Feeder Food {{ trigger.to_state.state }}"
+      message: "The cat feeder food level is {{ trigger.to_state.state | lower }}. Please refill."
+      data:
+        push:
+          interruption-level: time-sensitive

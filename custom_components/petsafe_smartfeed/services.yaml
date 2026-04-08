@@ -1,0 +1,30 @@
+feed:
+  name: Feed
+  description: Dispense food from a PetSafe Smart Feed feeder.
+  fields:
+    device_id:
+      name: Device
+      description: The PetSafe feeder to dispense from.
+      required: true
+      selector:
+        device:
+          integration: petsafe_smartfeed
+    amount:
+      name: Amount
+      description: Number of 1/8 cup portions to dispense (1-8).
+      required: false
+      default: 1
+      selector:
+        number:
+          min: 1
+          max: 8
+          step: 1
+          mode: slider
+          unit_of_measurement: "× 1/8 cup"
+    slow_feed:
+      name: Slow feed
+      description: Dispense food slowly.
+      required: false
+      default: false
+      selector:
+        boolean:

@@ -1,0 +1,12 @@
+services:
+  homeassistant:
+    image: ghcr.io/home-assistant/home-assistant:${HA_VERSION:-stable}
+    container_name: ha-petsafe-smartfeed-dev
+    restart: unless-stopped
+    volumes:
+      - ./config:/config
+      - ./custom_components/petsafe_smartfeed:/config/custom_components/petsafe_smartfeed:ro
+    environment:
+      - TZ=${TZ:-UTC}
+    ports:
+      - "${HA_PORT:-8123}:8123"

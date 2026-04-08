@@ -1,0 +1,22 @@
+[project]
+name = "ha-petsafe-smartfeed"
+version = "1.0.0"
+description = "Home Assistant custom component for PetSafe Smart Feed v2"
+license = "MIT"
+requires-python = ">=3.12"
+dependencies = [
+    "aiohttp",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21",
+    "pytest-aiohttp",
+    "aioresponses",
+    "homeassistant",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
