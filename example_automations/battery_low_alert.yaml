@@ -10,7 +10,7 @@ description: "Alert when PetSafe feeder battery drops below 20%"
 mode: single
 triggers:
   - trigger: numeric_state
-    entity_id: sensor.kitchen_feeder_battery_level  # Update to your entity
+    entity_id: sensor.kitchen_feeder_battery  # Update to your entity
     below: 20
     for:
       minutes: 30
@@ -24,8 +24,8 @@ actions:
     data:
       title: "PetSafe Feeder Battery Low"
       message: >
-        {{ state_attr('sensor.kitchen_feeder_battery_level', 'friendly_name') }}
-        battery is at {{ states('sensor.kitchen_feeder_battery_level') }}%.
+        {{ state_attr('sensor.kitchen_feeder_battery', 'friendly_name') }}
+        battery is at {{ states('sensor.kitchen_feeder_battery') }}%.
       data:
         push:
           interruption-level: time-sensitive
