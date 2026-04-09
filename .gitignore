@@ -11,7 +11,11 @@ build/
 .mypy_cache/
 .ruff_cache/
 
+# monitoring scripts (managed separately)
+scripts/
+
 # misc
+.claude/
 .coverage
 .vscode
 coverage.xml
