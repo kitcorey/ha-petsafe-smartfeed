@@ -12,6 +12,8 @@ MOCK_FEEDER_API_RESPONSE = {
     "food_sensor_current": 100,
     "connection_status": 2,
     "connection_status_timestamp": "2026-04-07T12:00:00.000Z",
+    "network_rssi": -48,
+    "firmware_version": "V2.0.9",
     "revision_desired": 5,
     "revision_reported": 5,
     "settings": {

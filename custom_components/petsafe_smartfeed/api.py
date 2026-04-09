@@ -5,7 +5,6 @@ import logging
 import re
 import time
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
 
 import aiohttp
 
@@ -43,7 +42,8 @@ class PetSafeFeederData:
     child_lock: bool
     is_batteries_installed: bool
     battery_voltage: int = 0
-    last_seen: datetime | None = None
+    network_rssi: int | None = None
+    firmware_version: str | None = None
     revision_synced: bool = True
     revision_desired: int | None = None
     revision_reported: int | None = None
@@ -68,17 +68,6 @@ class PetSafeFeederData:
 
         food_status = int(data.get("is_food_low", 0))
 
-        # Parse connection timestamp
-        last_seen = None
-        ts_str = data.get("connection_status_timestamp")
-        if ts_str:
-            try:
-                last_seen = datetime.fromisoformat(
-                    ts_str.replace("Z", "+00:00")
-                )
-            except (ValueError, TypeError):
-                pass
-
         revision_synced = (
             data.get("revision_desired") == data.get("revision_reported")
         )
@@ -94,7 +83,8 @@ class PetSafeFeederData:
             paused=bool(settings.get("paused", False)),
             child_lock=bool(settings.get("child_lock", False)),
             is_batteries_installed=is_batteries,
-            last_seen=last_seen,
+            network_rssi=data.get("network_rssi"),
+            firmware_version=data.get("firmware_version"),
             revision_synced=revision_synced,
             revision_desired=data.get("revision_desired"),
             revision_reported=data.get("revision_reported"),

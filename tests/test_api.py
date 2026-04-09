@@ -51,6 +51,8 @@ class TestPetSafeFeederData:
         assert data.paused is False
         assert data.child_lock is False
         assert data.is_batteries_installed is True
+        assert data.network_rssi == -48
+        assert data.firmware_version == "V2.0.9"
         # Battery: (26000 - 22755) / (29100 - 22755) * 100 ≈ 51%
         assert 40 <= data.battery_level <= 60
 

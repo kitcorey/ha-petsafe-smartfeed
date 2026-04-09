@@ -22,6 +22,7 @@ class PetSafeEntity(CoordinatorEntity[PetSafeCoordinator]):
             name=feeder.friendly_name,
             manufacturer="PetSafe",
             model="Smart Feed v2",
+            sw_version=feeder.firmware_version,
         )
 
     @property

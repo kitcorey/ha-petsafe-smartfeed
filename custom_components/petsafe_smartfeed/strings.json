@@ -51,8 +51,8 @@
       "food_level": {
         "name": "Food level"
       },
-      "last_seen": {
-        "name": "Last seen"
+      "wifi_signal": {
+        "name": "Wi-Fi signal"
       }
     },
     "switch": {

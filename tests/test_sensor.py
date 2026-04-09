@@ -1,6 +1,5 @@
 """Tests for PetSafe Smart Feed sensors."""
 
-from datetime import datetime, timezone
 from unittest.mock import MagicMock
 
 import pytest
@@ -9,7 +8,7 @@ from custom_components.petsafe_smartfeed.api import PetSafeFeederData
 from custom_components.petsafe_smartfeed.sensor import (
     PetSafeBatterySensor,
     PetSafeFoodLevelSensor,
-    PetSafeLastSeenSensor,
+    PetSafeWifiSignalSensor,
 )
 
 from conftest import MOCK_FEEDER_API_RESPONSE, MOCK_FEEDER_LOW_BATTERY
@@ -51,6 +50,7 @@ class TestBatterySensor:
 
         assert sensor.device_info is not None
         assert ("petsafe_smartfeed", thing_name) in sensor.device_info["identifiers"]
+        assert sensor.device_info["sw_version"] == "V2.0.9"
 
 
 class TestFoodLevelSensor:
@@ -88,27 +88,25 @@ class TestFoodLevelSensor:
         assert sensor.options == ["Full", "Low", "Empty"]
 
 
-class TestLastSeenSensor:
-    """Test last seen timestamp sensor."""
+class TestWifiSignalSensor:
+    """Test Wi-Fi signal strength sensor."""
 
-    def test_parses_timestamp(self):
+    def test_rssi_value(self):
         coordinator, thing_name = _make_coordinator(MOCK_FEEDER_API_RESPONSE)
-        sensor = PetSafeLastSeenSensor(coordinator, thing_name)
+        sensor = PetSafeWifiSignalSensor(coordinator, thing_name)
 
-        assert sensor.native_value == datetime(
-            2026, 4, 7, 12, 0, 0, tzinfo=timezone.utc
-        )
+        assert sensor.native_value == -48
 
     def test_none_when_missing(self):
         response = {**MOCK_FEEDER_API_RESPONSE}
-        del response["connection_status_timestamp"]
+        del response["network_rssi"]
         coordinator, thing_name = _make_coordinator(response)
-        sensor = PetSafeLastSeenSensor(coordinator, thing_name)
+        sensor = PetSafeWifiSignalSensor(coordinator, thing_name)
 
         assert sensor.native_value is None
 
     def test_unique_id(self):
         coordinator, thing_name = _make_coordinator(MOCK_FEEDER_API_RESPONSE)
-        sensor = PetSafeLastSeenSensor(coordinator, thing_name)
+        sensor = PetSafeWifiSignalSensor(coordinator, thing_name)
 
-        assert sensor.unique_id == f"{thing_name}_last_seen"
+        assert sensor.unique_id == f"{thing_name}_wifi_signal"

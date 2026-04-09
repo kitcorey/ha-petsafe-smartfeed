@@ -1,6 +1,5 @@
 """Sensor platform for PetSafe Smart Feed."""
 
-from datetime import datetime
 from typing import Any
 
 from homeassistant.components.sensor import (
@@ -9,7 +8,11 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import PERCENTAGE
+from homeassistant.const import (
+    PERCENTAGE,
+    SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
+    EntityCategory,
+)
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -29,7 +32,7 @@ async def async_setup_entry(
     for thing_name in coordinator.data:
         entities.append(PetSafeBatterySensor(coordinator, thing_name))
         entities.append(PetSafeFoodLevelSensor(coordinator, thing_name))
-        entities.append(PetSafeLastSeenSensor(coordinator, thing_name))
+        entities.append(PetSafeWifiSignalSensor(coordinator, thing_name))
     async_add_entities(entities)
 
 
@@ -70,16 +73,20 @@ class PetSafeFoodLevelSensor(PetSafeEntity, SensorEntity):
         return self.feeder_data.food_low_label
 
 
-class PetSafeLastSeenSensor(PetSafeEntity, SensorEntity):
-    """Last seen timestamp sensor."""
+class PetSafeWifiSignalSensor(PetSafeEntity, SensorEntity):
+    """Wi-Fi signal strength (RSSI) sensor."""
 
-    _attr_device_class = SensorDeviceClass.TIMESTAMP
-    _attr_translation_key = "last_seen"
+    _attr_device_class = SensorDeviceClass.SIGNAL_STRENGTH
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_native_unit_of_measurement = SIGNAL_STRENGTH_DECIBELS_MILLIWATT
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+    _attr_translation_key = "wifi_signal"
+    _attr_suggested_display_precision = 0
 
     def __init__(self, coordinator: PetSafeCoordinator, thing_name: str) -> None:
         super().__init__(coordinator, thing_name)
-        self._attr_unique_id = f"{thing_name}_last_seen"
+        self._attr_unique_id = f"{thing_name}_wifi_signal"
 
     @property
-    def native_value(self) -> datetime | None:
-        return self.feeder_data.last_seen
+    def native_value(self) -> int | None:
+        return self.feeder_data.network_rssi
