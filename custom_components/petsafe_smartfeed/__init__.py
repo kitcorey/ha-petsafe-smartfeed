@@ -95,9 +95,8 @@ def _register_services(hass: HomeAssistant) -> None:
 
         # Find the coordinator for this device
         coordinator: PetSafeCoordinator | None = None
-        for entry_id in hass.config_entries.async_entry_ids(DOMAIN):
-            entry = hass.config_entries.async_get_entry(entry_id)
-            if entry and hasattr(entry, "runtime_data"):
+        for entry in hass.config_entries.async_entries(DOMAIN):
+            if entry.runtime_data is not None:
                 coord = entry.runtime_data
                 if isinstance(coord, PetSafeCoordinator) and thing_name in coord.data:
                     coordinator = coord
